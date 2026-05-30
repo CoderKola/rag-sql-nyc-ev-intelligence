@@ -107,7 +107,7 @@ Data is fetched once via the ingest script, cleaned, and stored locally as Parqu
 ### 1. Clone and configure
 
 ```bash
-git clone https://github.com/pyiephyokoko/rag-sql-nyc-ev-intelligence.git
+git clone https://github.com/CoderKola/rag-sql-nyc-ev-intelligence.git
 cd rag-sql-nyc-ev-intelligence
 cp .env.example .env
 # edit .env — add DEEPSEEK_API_KEY and optionally SOCRATA_APP_TOKEN
