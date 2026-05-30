@@ -580,7 +580,8 @@
 	<div class="flex-1 flex flex-col overflow-hidden p-4 gap-3" style="background: #f5f5f5; border-left: 1px solid rgba(0,0,0,0.08);">
 
 		{#if !latestChart && !latestMapData && !latestMapTimeSeries}
-			<div class="flex flex-1 flex-col justify-center p-7 gap-6 select-none">
+			<div class="flex flex-1 flex-col justify-between p-7 select-none">
+			<div class="flex flex-col gap-6">
 				<div>
 					<p class="text-[11px] font-bold uppercase tracking-widest mb-3.5" style="color: rgba(0,0,0,0.48);">Data Coverage</p>
 					<div class="space-y-4">
@@ -641,6 +642,7 @@
 						</li>
 					</ul>
 				</div>
+			</div>
 
 				<p class="text-[11px] text-center" style="color: rgba(0,0,0,0.32);">Charts and maps appear here as you ask data questions</p>
 			</div>
