@@ -7,6 +7,7 @@ OLLAMA_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 
 
 def retrieve_context(query: str, client: chromadb.ClientAPI, n_results: int = 7) -> str:
+    # 7 balances coverage (enough columns for complex questions) vs prompt noise (weak matches add tokens, not signal)
     resp = httpx.post(
         f"{OLLAMA_URL}/api/embed",
         json={"model": "nomic-embed-text", "input": query},
