@@ -21,8 +21,10 @@ Built as a portfolio demonstration of low-cost, open-source AI infrastructure.
 ```mermaid
 flowchart LR
     Q([User Query]) --> API[FastAPI]
-    API --> Guard[EV Guard]
-    Guard --> RAG[ChromaDB\nRAG retrieval]
+    API --> Guard[DeepSeek\nEV Guard]
+    Guard -->|pass| Embed[nomic-embed-text\nOllama]
+    Guard -->|fail| Rej([Rejected])
+    Embed --> RAG[ChromaDB\nRAG retrieval]
     RAG --> Router{Route}
 
     Router -->|analytics| SQL[DeepSeek → DuckDB]
