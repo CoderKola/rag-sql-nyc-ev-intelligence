@@ -3,7 +3,7 @@ import re
 import httpx
 
 from . import llm
-from .prompts import GUARD_PROMPT
+from ..data.prompts import GUARD_PROMPT
 
 # Fast-path reject: if none of these EV-specific signals appear, skip the LLM call entirely.
 # No trailing \b — allows plurals (stations, sessions, chargers) and inflections (charging).

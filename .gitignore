@@ -1,5 +1,5 @@
 .env
-data/
+/data/
 __pycache__/
 *.pyc
 *.pyo
@@ -10,3 +10,4 @@ venv/
 frontend/node_modules/
 frontend/.svelte-kit/
 frontend/build/
+personal/
