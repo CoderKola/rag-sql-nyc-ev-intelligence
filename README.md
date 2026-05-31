@@ -49,7 +49,7 @@ flowchart LR
 
 **Routing** — A regex-based intent classifier dispatches each query to one of four handlers: analytics SQL, direct RAG answer, nearest-charger geocode, or elaboration of a prior result. The classifier runs client-side in Python before any LLM call, keeping latency low on simple paths.
 
-**RAG** — ChromaDB stores embedded schema documentation and domain knowledge (analyst reasoning guidelines, data gotchas). On every request the top-k most relevant chunks are retrieved and injected into the LLM prompt, giving the model accurate column semantics without fine-tuning.
+**RAG** — ChromaDB stores embedded schema documentation (column semantics, data ranges, gotchas). On every request the top-k most relevant column chunks are retrieved and injected into the SQL prompt. Domain knowledge — analyst reasoning guidelines, program facts, data traps — is injected directly into the system prompt at startup rather than retrieved, since the corpus is small enough (~2k tokens) that retrieval adds latency without benefit.
 
 **SQL engine** — DuckDB queries the dataset directly from a local Parquet file. Vectorized column scans over 240k rows complete in milliseconds. The LLM generates SQL; on failure, a second LLM call auto-corrects the query before surfacing an error.
 

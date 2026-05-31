@@ -376,52 +376,7 @@ def build_chroma_index() -> None:
     print(f"Added {len(ids)} schema chunks to ChromaDB at {CHROMA_PATH}")
 
 
-def build_skills_index(skills_dir: str = "./skills") -> None:
-    """Embed domain knowledge markdown files from skills/ into ChromaDB."""
-    if not os.path.isdir(skills_dir):
-        print(f"No skills/ directory found at {skills_dir} — skipping")
-        return
-
-    skill_files = sorted(f for f in os.listdir(skills_dir) if f.endswith(".md"))
-    if not skill_files:
-        print("No .md files in skills/ — skipping")
-        return
-
-    _check_ollama()
-    client = chromadb.PersistentClient(path=CHROMA_PATH)
-    collection = client.get_or_create_collection("ev_charging_schema")
-    existing_ids = set(collection.get(include=[])["ids"])
-
-    ids, embeddings, documents, metadatas = [], [], [], []
-    for filename in skill_files:
-        skill_id = f"skill:{os.path.splitext(filename)[0]}"
-        path = os.path.join(skills_dir, filename)
-        doc = open(path).read().strip()
-
-        if skill_id in existing_ids:
-            # Re-embed to pick up edits
-            collection.update(
-                ids=[skill_id],
-                embeddings=[_embed(doc)],
-                documents=[doc],
-                metadatas=[{"type": "skill", "file": filename}],
-            )
-            print(f"  updated skill {filename}")
-        else:
-            emb = _embed(doc)
-            ids.append(skill_id)
-            embeddings.append(emb)
-            documents.append(doc)
-            metadatas.append({"type": "skill", "file": filename})
-            print(f"  embedded skill {filename}")
-
-    if ids:
-        collection.add(ids=ids, embeddings=embeddings, documents=documents, metadatas=metadatas)
-        print(f"Added {len(ids)} skill chunks to ChromaDB at {CHROMA_PATH}")
-
-
 if __name__ == "__main__":
     fetch_and_save()
     build_chroma_index()
-    build_skills_index()
     print("Ingest complete.")

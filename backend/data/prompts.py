@@ -1,9 +1,26 @@
+import pathlib
 from typing import NamedTuple
 
 
 class Prompt(NamedTuple):
     system: str
     user: str
+
+
+# Skills are static, small (~2k tokens), and always relevant — inject directly rather than
+# retrieving via RAG, which can silently miss critical gotchas when column docs score higher.
+_SKILLS_DIR = pathlib.Path(__file__).parent.parent.parent / "skills"
+
+
+def _load_skills() -> str:
+    if not _SKILLS_DIR.exists():
+        return ""
+    return "\n\n---\n\n".join(
+        p.read_text().strip() for p in sorted(_SKILLS_DIR.glob("*.md"))
+    )
+
+
+_SKILLS_BLOCK = "\n\n---\n\nDomain knowledge and analyst guidelines:\n\n" + _load_skills()
 
 
 GUARD_PROMPT = Prompt(
@@ -29,7 +46,7 @@ DIRECT_PROMPT = Prompt(
 Answer completely and specifically — never say "visit the website" or "check the official page."
 Be specific: cite rates, addresses, payment methods, or procedures if known.
 Where relevant, note implications for network planning or improvement.
-Keep it concise and actionable.""",
+Keep it concise and actionable.""" + _SKILLS_BLOCK + "",
     user="""Program context and knowledge:
 {retrieved_context}
 
@@ -75,7 +92,7 @@ Rules:
 - Growth/trend questions: always include both the target period AND the prior period for year-over-year change; for multi-year trends return all years
 - Geographic visualization: if your query SELECTs `session_year` or `session_month`, you MUST also include `location_name_clean` in SELECT and GROUP BY — no exceptions. A per-location breakdown enables the animated map panel and is always more informative than a single network aggregate
 - Ranking/comparison: include a sessions-per-connector or energy-per-session ratio column wherever it adds analytical value
-- Nearest charger queries: if coordinates are provided, compute Haversine distance in km using DuckDB math, SELECT DISTINCT location_name_clean + distance_km, ORDER BY distance_km ASC, LIMIT 9""",
+- Nearest charger queries: if coordinates are provided, compute Haversine distance in km using DuckDB math, SELECT DISTINCT location_name_clean + distance_km, ORDER BY distance_km ASC, LIMIT 9""" + _SKILLS_BLOCK + "",
     user="""Parquet file path: '{parquet_path}'
 Data covers sessions through {data_year}. data_year = {data_year_int} (integer for SQL). data_complete_year = {data_complete_year} (last complete year, use for recency defaults).
 
@@ -129,7 +146,7 @@ After the Python block (or after the last section if no chart), output a map_sty
 {"metric": "exact_column_name", "palette": "palette_key"}
 ```
 - metric: the exact numeric column name from the query results that best represents what the user asked (e.g. avg_duration_min, total_sessions, median_kwh_per_session). Must match a real column header.
-- palette_key: choose the single best fit — sessions (counts/volume), energy (kWh/power), duration (time/minutes), growth (YoY change/trends), roaming (payment-type ratios), connectors (infrastructure/capacity).""",
+- palette_key: choose the single best fit — sessions (counts/volume), energy (kWh/power), duration (time/minutes), growth (YoY change/trends), roaming (payment-type ratios), connectors (infrastructure/capacity).""" + _SKILLS_BLOCK + "",
     user="""User asked: {user_question}
 Query executed:
 {sql_query}
