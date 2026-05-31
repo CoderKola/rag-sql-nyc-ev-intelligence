@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 from sodapy import Socrata
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from backend.locations import LOCATION_COORDS
+from backend.data.locations import LOCATION_COORDS
 
 load_dotenv()
 

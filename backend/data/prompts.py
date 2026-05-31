@@ -56,6 +56,7 @@ Write a single DuckDB SQL query to answer the user's question.
 
 Rules:
 - Return ONLY the SQL query, no explanation
+- The dataset is a parquet file — always use `FROM '{parquet_path}'` exactly as provided. Never use a table name like `session` or `ev_charging`.
 - Never use columns not in the schema
 - Every non-aggregated SELECT expression must appear in GROUP BY (including CASE expressions)
 - Location filtering: ALWAYS use `location_name_clean`, never `location_name` — the raw column has duplicate name variants for the same facility
@@ -86,7 +87,10 @@ Question: {user_question}""",
 
 SQL_FIX_PROMPT = Prompt(
     system="You are a DuckDB SQL expert. Fix the query and return ONLY the corrected SQL, no explanation.",
-    user="""Original query:
+    user="""Parquet file path: '{parquet_path}'
+The dataset must be queried using FROM '{parquet_path}' — never a bare table name.
+
+Original query:
 {sql}
 
 Error:

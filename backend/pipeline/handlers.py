@@ -279,7 +279,7 @@ async def handle_sql(
         fixed_raw, in_tok_f, out_tok_f = await llm.call_deepseek(
             http_client,
             system=SQL_FIX_PROMPT.system,
-            user=SQL_FIX_PROMPT.user.format(sql=sql, error=result),
+            user=SQL_FIX_PROMPT.user.format(parquet_path=parquet_path, sql=sql, error=result),
         )
         budget.log_usage("deepseek-v4-flash", in_tok_f, out_tok_f)
         sql = extract_sql(fixed_raw)
